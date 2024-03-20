@@ -33,6 +33,7 @@ class NoteController extends BaseCommonController {
   @override
   void initData() {
     // TODO: implement initData
+    getCalCount();
   }
 
   queryListByFilterStatus(
@@ -88,6 +89,8 @@ class NoteController extends BaseCommonController {
     var markedCheckCount = await noteDataRepository.calCountByCondition(true);
     var markedUnCheckCount =
         await noteDataRepository.calCountByCondition(false);
+    print(
+        'markedCheckCount=$markedCheckCount,markedUnCheckCount=$markedUnCheckCount');
     rxFinishNumber.value = markedCheckCount;
     rxActiveNumber.value = markedUnCheckCount;
   }
