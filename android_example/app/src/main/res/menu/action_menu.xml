@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/action_filter"
+        android:icon="@drawable/ic_filter"
+        android:title="filter"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/action_mark"
+        app:showAsAction="never"
+        android:title="Mark all complete"/>
+    <item
+        android:id="@+id/action_clear"
+        app:showAsAction="never"
+        android:title="Clear completed"/>
+
+</menu>
