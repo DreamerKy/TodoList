@@ -45,7 +45,6 @@ class TodosFragment : BaseShareDataMvvmFragment<FragmentHomeBinding, SharedViewM
             }
         }*/
     }
-
     /**
      * 初始化 Adapter
      */
@@ -75,7 +74,7 @@ class TodosFragment : BaseShareDataMvvmFragment<FragmentHomeBinding, SharedViewM
         list.forEach {
             items.add(UITodoItem(it.id, it.title, it.desc, it.createTime, it.completed))
         }
-        mAdapter!!.setData(items)
+        mAdapter!!.submitList(items)
     }
 
     override fun onDestroyView() {

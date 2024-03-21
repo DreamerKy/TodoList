@@ -7,7 +7,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
-import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.example.android.BR
 import com.example.android.databinding.ItemTodosBinding
@@ -18,23 +19,34 @@ import com.example.android.ui.TodoDetailActivity
  * @author Created by steven
  * @time Created on 2024/3/11
  */
-class TodosAdapter : RecyclerView.Adapter<TodosAdapter.BindingHolder>() {
 
-    private var mOnItemClickListener:OnItemClickListener? = null
-    private var items = mutableListOf<UITodoItem>()
-    fun setOnItemClickListener(listener:OnItemClickListener){
+
+
+class TodosAdapter : ListAdapter<UITodoItem, TodosAdapter.BindingHolder>(diffCallback) {
+
+    private var mOnItemClickListener: OnItemClickListener? = null
+
+    companion object {
+        val diffCallback = object : DiffUtil.ItemCallback<UITodoItem>() {
+            override fun areItemsTheSame(oldItem: UITodoItem, newItem: UITodoItem): Boolean {
+                return oldItem.todoId == newItem.todoId
+            }
+
+            override fun areContentsTheSame(oldItem: UITodoItem, newItem: UITodoItem): Boolean {
+                //如果新数据和旧数据的标题、内容、状态相同,则视为两个item的内容相同
+                return oldItem.title == newItem.title && oldItem.content == newItem.content && oldItem.completed == newItem.completed
+            }
+
+        }
+    }
+
+    fun setOnItemClickListener(listener: OnItemClickListener) {
         mOnItemClickListener = listener
     }
-    interface OnItemClickListener{
-        fun onItemClick(view:View,position:Int)
-    }
 
-    fun setData(newData: MutableList<UITodoItem>) {
-        items.clear()
-        items.addAll(newData)
-        notifyDataSetChanged()
+    interface OnItemClickListener {
+        fun onItemClick(view: View, position: Int)
     }
-
 
     /**
      * @return 返回的是adapter的view
@@ -44,9 +56,10 @@ class TodosAdapter : RecyclerView.Adapter<TodosAdapter.BindingHolder>() {
             LayoutInflater.from(parent.context),
             viewType,
             parent,
-            false)
-        if(binding is ItemTodosBinding){
-            binding.setVariable(BR.onclickHandler,OnclickHandler())
+            false
+        )
+        if (binding is ItemTodosBinding) {
+            binding.setVariable(BR.onclickHandler, OnclickHandler())
         }
         return BindingHolder(binding)
     }
@@ -56,26 +69,23 @@ class TodosAdapter : RecyclerView.Adapter<TodosAdapter.BindingHolder>() {
     * */
     override fun onBindViewHolder(holder: BindingHolder, position: Int) {
 
-        holder.bindData(items[position])
+        holder.bindData(getItem(position))
 
         mOnItemClickListener?.let {
             (holder.binding as? ItemTodosBinding)?.markCb?.setOnClickListener {
-                mOnItemClickListener!!.onItemClick(it,position)
+                mOnItemClickListener!!.onItemClick(it, position)
             }
         }
-
     }
 
-    override fun getItemCount() = items.size
-
-    override fun getItemViewType(position: Int) = items[position].getViewType()
+    override fun getItemViewType(position: Int) = getItem(position).getViewType()
 
     class BindingHolder(var binding: ViewDataBinding) : ViewHolder(binding.root) {
         fun bindData(item: IBindingAdapterItem?) {
-            binding.setVariable(BR.var_item,item)
+            binding.setVariable(BR.var_item, item)
             // 双向绑定 使用内置控件支持写法 发现无效，怎么做才可以？
             (binding as? ItemTodosBinding)?.markCb?.apply {
-                isChecked =  (item as? UITodoItem)?.completed!!
+                isChecked = (item as? UITodoItem)?.completed!!
             }
         }
     }
@@ -83,7 +93,7 @@ class TodosAdapter : RecyclerView.Adapter<TodosAdapter.BindingHolder>() {
     class OnclickHandler {
         fun onClick(view: View, myData: UITodoItem) {
             val intent = Intent(view.context, TodoDetailActivity::class.java)
-            intent.putExtra("todoId",myData.todoId)
+            intent.putExtra("todoId", myData.todoId)
             view.context.startActivity(intent)
         }
 
@@ -93,4 +103,3 @@ class TodosAdapter : RecyclerView.Adapter<TodosAdapter.BindingHolder>() {
     }
 
 }
-

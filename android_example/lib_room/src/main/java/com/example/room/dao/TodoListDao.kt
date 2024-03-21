@@ -98,7 +98,7 @@ interface TodoListDao {
      * 查询所有数据（返回Flow数据流）
      */
     @Query("SELECT * FROM $TABLE_TODO_LIST")
-    suspend fun queryAllFlow(): Flow<MutableList<TodoListInfo>>?
+    fun queryAllFlow(): Flow<MutableList<TodoListInfo>>?
 
     /**
      * 查询所有数据（返回数据列表）
