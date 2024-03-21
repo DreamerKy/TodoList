@@ -64,7 +64,7 @@ class TodosAdapter : ListAdapter<UITodoItem, TodosAdapter.BindingHolder>(diffCal
         val holder = BindingHolder(binding)
         mOnItemClickListener?.let {
             (holder.binding as? ItemTodosBinding)?.markCb?.setOnClickListener {
-                mOnItemClickListener!!.onItemClick(it, holder.layoutPosition)
+                mOnItemClickListener!!.onItemClick(it, holder.adapterPosition)
             }
         }
         return holder
