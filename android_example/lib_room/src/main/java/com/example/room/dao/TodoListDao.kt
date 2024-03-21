@@ -89,19 +89,19 @@ interface TodoListDao {
 
 
     /**
-     * 查询所有数据
+     * 查询所有数据（返回LiveData数据流）
      */
     @Query("SELECT * FROM $TABLE_TODO_LIST")
     fun queryAllLiveData(): LiveData<MutableList<TodoListInfo>>?
 
     /**
-     * 查询所有数据
+     * 查询所有数据（返回Flow数据流）
      */
     @Query("SELECT * FROM $TABLE_TODO_LIST")
-    fun queryAllFlow(): Flow<MutableList<TodoListInfo>>?
+    suspend fun queryAllFlow(): Flow<MutableList<TodoListInfo>>?
 
     /**
-     * 查询所有数据
+     * 查询所有数据（返回数据列表）
      */
     @Query("SELECT * FROM $TABLE_TODO_LIST")
     suspend fun queryAll(): MutableList<TodoListInfo>?
@@ -116,7 +116,7 @@ interface TodoListDao {
      * 根据状态查询数据
      */
     @Query("SELECT * FROM $TABLE_TODO_LIST WHERE completed=:status")
-    fun queryByStatus(status: Boolean): LiveData<MutableList<TodoListInfo>>?
+    fun queryByStatus(status: Boolean): Flow<MutableList<TodoListInfo>>?
 
     /**
      * 删除已完成的

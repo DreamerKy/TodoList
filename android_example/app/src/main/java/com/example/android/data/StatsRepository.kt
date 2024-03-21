@@ -27,10 +27,10 @@ class StatsRepository {
     /**
      * 获取待办列表,返回Flow数据流
      */
-    fun getTodoListFlow(): Flow<MutableList<TodoListInfo>>? {
-        //模拟耗时
-        Thread.sleep(2000)
-        return DataBaseManager.getTodoListFlow()
+    suspend fun getTodoListFlow(): Flow<MutableList<TodoListInfo>>? {
+        return withContext(Dispatchers.IO) {
+            DataBaseManager.getTodoListFlow()
+        }
     }
 
     /**

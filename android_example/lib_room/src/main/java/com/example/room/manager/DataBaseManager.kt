@@ -71,10 +71,17 @@ object DataBaseManager {
     }
 
     /**
+     * 获取完成状态的列表
+     */
+    fun getTodoListCompleted(): Flow<MutableList<TodoListInfo>>? {
+        return todoListDao.queryByStatus(true)
+    }
+
+    /**
      * 获取特定状态的列表
      */
-    fun getTodoListByStatus(status:Boolean): LiveData<MutableList<TodoListInfo>>? {
-        return todoListDao.queryByStatus(status)
+    fun getTodoListActive(): Flow<MutableList<TodoListInfo>>? {
+        return todoListDao.queryByStatus(false)
     }
 
     /**
@@ -87,7 +94,7 @@ object DataBaseManager {
     /**
      * 获取待办列表
      */
-    fun getTodoListFlow(): Flow<MutableList<TodoListInfo>>? {
+    suspend fun getTodoListFlow(): Flow<MutableList<TodoListInfo>>? {
         return todoListDao.queryAllFlow()
     }
 

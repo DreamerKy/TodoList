@@ -1,8 +1,6 @@
 package com.example.android.ui.stats
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.asLiveData
 import com.example.android.data.StatsRepository
 import com.example.android.util.MMKVManager
 import com.example.common.base.BaseViewModel
@@ -10,7 +8,6 @@ import com.example.common.constant.FILTER_ACTIVE
 import com.example.common.constant.FILTER_ALL
 import com.example.common.constant.FILTER_COMPLETED
 import com.example.room.entity.TodoListInfo
-import kotlinx.coroutines.flow.Flow
 
 
 /**
@@ -26,41 +23,52 @@ import kotlinx.coroutines.flow.Flow
  *      3、每个 fragment 都有其自己的生命周期，且不受别的 fragment 生命周期的影响。 如果一个 fragment 替换了另一个，UI 可以继续正常工作而不受影响。
  */
 class SharedViewModel : BaseViewModel() {
-
-    var todoListAll: MutableLiveData<MutableList<TodoListInfo>>? = null
-    var todoListAllFlow: Flow<MutableList<TodoListInfo>>? = null
-    private var todoListShow: MutableLiveData<MutableList<TodoListInfo>>? = null
+    //记录当前首页显示的是全部列表、已完成还是未完成，默认是全部
+    private var status = ALL
+    var todoListAll = MutableLiveData<MutableList<TodoListInfo>>()
+    var todoListShow = MutableLiveData<MutableList<TodoListInfo>>()
     var markStats = MutableLiveData<Boolean>()
+
+    private var hasInit = false
+
+    companion object{
+        const val ALL = 0
+        const val COMPLETED = 1
+        const val ACTIVE = 2
+    }
+
     private val statsRepository by lazy { StatsRepository() }
 
     /**
-     * 获取待办列表(返回的是 LiveData ,只要数据库有更新，就会通知)
+     * 获取待办列表(在 ViewModel 中观察 Flow 数据流，只要更改数据库重的数据，都会触发 emit)
      */
-    fun getAllTodos() : LiveData<MutableList<TodoListInfo>>? {
-        /*if(todoListAll == null){
-            todoListAll = statsRepository.getTodoList() as RoomTrackingLiveData<MutableList<TodoListInfo>>?
-        }*/
-        return null;
-    }
-
-    /**
-     * 获取待办列表
-     */
-    fun getAllTodosFlow() : MutableLiveData<MutableList<TodoListInfo>>? {
-        if(todoListAll == null){
-            todoListAll = statsRepository.getTodoListFlow()?.asLiveData() as MutableLiveData<MutableList<TodoListInfo>>
+    fun getAllTodos() {
+        if (hasInit) {
+            return
         }
-        return todoListAll;
-    }
+        launchOnUI{
+            hasInit = true
+            statsRepository.getTodoListFlow()?.collect {
+                todoListAll.value = it
+                when (status) {
+                    ALL -> {
+                        todoListShow.value = it
+                    }
 
-    /**
-     * 获取首页展示列表(返回的是 LiveData ,只要数据库有更新，就会通知)
-     */
-    fun getTodosShow() : MutableLiveData<MutableList<TodoListInfo>>? {
-        if(todoListShow == null){
-            todoListShow = statsRepository.getTodoListFlow()?.asLiveData() as MutableLiveData<MutableList<TodoListInfo>>
+                    COMPLETED -> {
+                        todoListShow.value = it.filter { item ->
+                            item.completed
+                        } as MutableList
+                    }
+
+                    ACTIVE -> {
+                        todoListShow.value = it.filter { item ->
+                            !item.completed
+                        } as MutableList
+                    }
+                }
+            }
         }
-        return todoListShow;
     }
 
     /**
@@ -68,7 +76,7 @@ class SharedViewModel : BaseViewModel() {
      */
     fun doMark(toMarkAllCompleted: Boolean) {
         launchOnUI {
-            todoListAll?.value?.let {
+            todoListAll.value?.let {
                 statsRepository.updateTodoItems(it, toMarkAllCompleted)
                 MMKVManager.setMarkALLComplete(!MMKVManager.isMarkALLComplete())
                 markStats.value = MMKVManager.isMarkALLComplete()
@@ -79,18 +87,20 @@ class SharedViewModel : BaseViewModel() {
     /**
      * 根据状态过滤待办列表
      */
-    fun filterTodoList(flag : String){
+    fun filterTodoList(flag: String) {
         when (flag) {
             FILTER_ALL -> {
+                status = ALL
                 todoListAll?.let {
-                    it.value?.let {value ->
+                    it.value?.let { value ->
                         setLiveDataValue(value)
                     }
                 }
             }
 
             FILTER_ACTIVE -> {
-               val activeList = todoListAll?.value?.filter {
+                status = ACTIVE
+                val activeList = todoListAll?.value?.filter {
                     !it.completed
                 }
                 activeList?.let {
@@ -100,6 +110,7 @@ class SharedViewModel : BaseViewModel() {
             }
 
             FILTER_COMPLETED -> {
+                status = COMPLETED
                 val completedList = todoListAll?.value?.filter {
                     it.completed
                 }
@@ -110,7 +121,7 @@ class SharedViewModel : BaseViewModel() {
         }
     }
 
-    private fun setLiveDataValue(value : MutableList<TodoListInfo>){
+    private fun setLiveDataValue(value: MutableList<TodoListInfo>) {
         todoListShow?.let {
             it.value = value
         }

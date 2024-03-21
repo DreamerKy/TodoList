@@ -8,10 +8,7 @@ import com.example.android.databinding.FragmentHomeBinding
 import com.example.android.ui.stats.SharedViewModel
 import com.example.common.base.BaseShareDataMvvmFragment
 import com.example.room.entity.TodoListInfo
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 /**
  * Description:首页列表
@@ -20,25 +17,33 @@ import kotlinx.coroutines.withContext
  */
 class TodosFragment : BaseShareDataMvvmFragment<FragmentHomeBinding, SharedViewModel>() {
 
-    private var refreshWholeList = true
     private lateinit var mAdapter: TodosAdapter
 
     override fun initView(view: View, savedInstanceState: Bundle?) {
         mBinding?.viewModel = mViewModel
         setUpListView()
-        //1、定义了一个协程作用域，默认调度在 Dispatchers.Main
+
+        //先订阅
+        mViewModel.todoListShow.observe(viewLifecycleOwner) {
+            dismissLoading()
+            refreshListView(it)
+        }
+        //再获取
+        mViewModel.getAllTodos()
+
+        /*//1、定义了一个协程作用域，默认调度在 Dispatchers.Main
         lifecycleScope.launch {
             showLoading()
             //2、挂起协程，将数据请求操作移至I/O线程
             val todoListShow = withContext(Dispatchers.IO) {
-                mViewModel.getTodosShow()
+                mViewModel.getAllTodos()
             }
             //3、协程执行恢复操作，回到主线程继续执行
-            todoListShow?.observe(viewLifecycleOwner) {
+            mViewModel.todoListShow.observe(viewLifecycleOwner) {
                 dismissLoading()
                 refreshListView(it)
             }
-        }
+        }*/
     }
 
     /**
@@ -51,20 +56,13 @@ class TodosFragment : BaseShareDataMvvmFragment<FragmentHomeBinding, SharedViewM
         mBinding?.recyclerview?.adapter = mAdapter
         mAdapter.setOnItemClickListener(object : TodosAdapter.OnItemClickListener {
             override fun onItemClick(view: View, position: Int) {
-                val item = mViewModel.todoListAll?.value?.get(position)!!
+                val item = mViewModel.todoListShow?.value?.get(position)!!
                 item.let {
                     it.completed = !it.completed
-                    //点击改变列表中条目状态时，不触发整个列表刷新
-                    refreshWholeList = false
                     mViewModel.updateTodo(it)
                 }
             }
         })
-    }
-
-    override fun onFragmentVisible(isVisibleToUser: Boolean) {
-        //页面可见性变化时重置状态
-        refreshWholeList = true
     }
 
     /**
@@ -72,7 +70,7 @@ class TodosFragment : BaseShareDataMvvmFragment<FragmentHomeBinding, SharedViewM
      * @param list MutableList<TodoListInfo>
      */
     private fun refreshListView(list: MutableList<TodoListInfo>?) {
-        if (list == null || !refreshWholeList) return
+        if (list == null) return
         val items = mutableListOf<UITodoItem>()
         list.forEach {
             items.add(UITodoItem(it.id, it.title, it.desc, it.createTime, it.completed))
