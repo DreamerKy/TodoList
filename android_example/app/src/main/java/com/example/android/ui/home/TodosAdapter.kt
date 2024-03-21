@@ -61,21 +61,28 @@ class TodosAdapter : ListAdapter<UITodoItem, TodosAdapter.BindingHolder>(diffCal
         if (binding is ItemTodosBinding) {
             binding.setVariable(BR.onclickHandler, OnclickHandler())
         }
-        return BindingHolder(binding)
+        val holder = BindingHolder(binding)
+        mOnItemClickListener?.let {
+            (holder.binding as? ItemTodosBinding)?.markCb?.setOnClickListener {
+                mOnItemClickListener!!.onItemClick(it, holder.layoutPosition)
+            }
+        }
+        return holder
     }
 
     /*
     * 数据绑定
     * */
     override fun onBindViewHolder(holder: BindingHolder, position: Int) {
-
         holder.bindData(getItem(position))
-
-        mOnItemClickListener?.let {
+        // fixed
+        // 点击事件放在这里会导致列表刷新后，点击位置和条目在数据集中的位置不一致
+        // 内存浪费，每次复用时回调到这里都会给控件设置一个Listener，所以将设置点击事件放在创建ViewHolder的地方
+        /*mOnItemClickListener?.let {
             (holder.binding as? ItemTodosBinding)?.markCb?.setOnClickListener {
                 mOnItemClickListener!!.onItemClick(it, position)
             }
-        }
+        }*/
     }
 
     override fun getItemViewType(position: Int) = getItem(position).getViewType()

@@ -39,12 +39,13 @@ class StatsRepository {
     suspend fun addCompleteItem() {
         val random = Random()
         val randomChar = (random.nextInt(26).plus('A'.code)).toChar()
+        val randomChar2 = random.nextInt(1000)
         withContext(Dispatchers.IO) {
             val todoListInfo = TodoListInfo()
             todoListInfo.title =
-                randomChar.toString() + randomChar.toString() + randomChar.toString()
+                randomChar.toString() + randomChar.toString() + randomChar.toString() + randomChar2
             todoListInfo.desc = randomChar.toLowerCase().toString() + randomChar.toLowerCase()
-                .toString() + randomChar.toLowerCase().toString()
+                .toString() + randomChar.toLowerCase().toString() + randomChar2
             todoListInfo.completed = true
             todoListInfo.createTime = System.currentTimeMillis().toString()
             DataBaseManager.insertTodoItem(todoListInfo)
@@ -57,12 +58,13 @@ class StatsRepository {
     suspend fun addActiveItem() {
         val random = Random()
         val randomChar = (random.nextInt(26).plus('A'.code)).toChar()
+        val randomChar2 = random.nextInt(1000)
         withContext(Dispatchers.IO) {
             val todoListInfo = TodoListInfo()
             todoListInfo.title =
-                randomChar.toString() + randomChar.toString() + randomChar.toString()
+                randomChar.toString() + randomChar.toString() + randomChar.toString()+ randomChar2
             todoListInfo.desc = randomChar.toLowerCase().toString() + randomChar.toLowerCase()
-                .toString() + randomChar.toLowerCase().toString()
+                .toString() + randomChar.toLowerCase().toString() + randomChar2
             todoListInfo.createTime = System.currentTimeMillis().toString()
             DataBaseManager.insertTodoItem(todoListInfo)
         }
