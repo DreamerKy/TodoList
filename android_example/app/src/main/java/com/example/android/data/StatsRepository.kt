@@ -16,21 +16,37 @@ import java.util.Random
 class StatsRepository {
 
     /**
-     * 获取待办列表
-     */
-    fun getTodoList(): LiveData<MutableList<TodoListInfo>>? {
-        //模拟耗时
-        Thread.sleep(2000)
-        return DataBaseManager.getTodoList()
-    }
-
-    /**
      * 获取待办列表,返回Flow数据流
      */
     suspend fun getTodoListFlow(): Flow<MutableList<TodoListInfo>>? {
         return withContext(Dispatchers.IO) {
             DataBaseManager.getTodoListFlow()
         }
+    }
+
+    /**
+     * 根据 id 获取条目
+     */
+    suspend fun getTodoListFlow(id: Long): Flow<TodoListInfo>? {
+        return withContext(Dispatchers.IO) {
+            DataBaseManager.getTodoItemById(id)
+        }
+    }
+
+    /**
+     * 根据 id 删除条目
+     */
+    suspend fun deleteTodoItemById(id: Long) : Int {
+        return withContext(Dispatchers.IO) {
+            DataBaseManager.deleteTodoItemById(id)
+        }
+    }
+
+    /**
+     * 插入新条目
+     */
+    suspend fun insertTodoItem(todoListInfo: TodoListInfo):Long {
+        return DataBaseManager.insertTodoItem(todoListInfo)
     }
 
     /**
@@ -103,10 +119,18 @@ class StatsRepository {
     }
 
     /**
+     * 根据todoListInfo更新Item
+     * @param todoListInfo
+     */
+    suspend fun updateTodoItem(todoListInfo: TodoListInfo) :Int{
+        return DataBaseManager.updateTodoItem(todoListInfo)
+    }
+
+    /**
      * 修改一个条目状态
      */
-    suspend fun updateTodoItems(bean: TodoListInfo) {
-        withContext(Dispatchers.IO) {
+    suspend fun updateTodoItems(bean: TodoListInfo) : Int {
+        return withContext(Dispatchers.IO) {
             DataBaseManager.updateTodoItem(bean)
         }
     }

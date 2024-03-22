@@ -110,7 +110,7 @@ interface TodoListDao {
      * 根据id查询某个数据
      */
     @Query("SELECT * FROM $TABLE_TODO_LIST WHERE id=:id")
-    suspend fun query(id: Long): TodoListInfo?
+    fun query(id: Long): Flow<TodoListInfo>?
 
     /**
      * 根据状态查询数据

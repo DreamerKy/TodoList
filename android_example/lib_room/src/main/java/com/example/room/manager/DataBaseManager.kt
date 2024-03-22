@@ -1,6 +1,5 @@
 package com.example.room.manager
 
-import androidx.lifecycle.LiveData
 import com.example.room.database.TodoListDataBase
 import com.example.room.entity.TodoListInfo
 import kotlinx.coroutines.flow.Flow
@@ -66,30 +65,10 @@ object DataBaseManager {
      * 根据id获取Item
      * @param id
      */
-    suspend fun getTodoItemById(id: Long): TodoListInfo? {
+    suspend fun getTodoItemById(id: Long): Flow<TodoListInfo>? {
         return todoListDao.query(id)
     }
 
-    /**
-     * 获取完成状态的列表
-     */
-    fun getTodoListCompleted(): Flow<MutableList<TodoListInfo>>? {
-        return todoListDao.queryByStatus(true)
-    }
-
-    /**
-     * 获取特定状态的列表
-     */
-    fun getTodoListActive(): Flow<MutableList<TodoListInfo>>? {
-        return todoListDao.queryByStatus(false)
-    }
-
-    /**
-     * 获取待办列表
-     */
-    fun getTodoList(): LiveData<MutableList<TodoListInfo>>? {
-        return todoListDao.queryAllLiveData()
-    }
 
     /**
      * 获取待办列表

@@ -3,7 +3,6 @@ package com.example.android.ui.home
 
 import androidx.databinding.BaseObservable
 import androidx.databinding.Bindable
-import com.example.android.BR
 import com.example.android.R
 
 /**
@@ -14,7 +13,7 @@ import com.example.android.R
  * @property completed Boolean?
  * @constructor
  */
-class UITodoItem(val todoId:Long?, var title: String?, var content:String?, val createTime:String?,var completed:Boolean):BaseObservable(), IBindingAdapterItem {
+class UITodoItem(val todoId:Long?, var title: String?, var content:String?, val createTime:String?,var completed:Boolean,var status:String = if(completed){"已完成"}else{"未完成"}):BaseObservable(), IBindingAdapterItem {
     override fun getViewType(): Int {
         return R.layout.item_todos
     }
