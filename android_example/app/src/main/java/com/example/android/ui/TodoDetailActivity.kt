@@ -54,11 +54,6 @@ class TodoDetailActivity : BaseMvvmActivity<ActivityTodoDetailBinding, TodosDeta
                 mBinding.setVariable(BR.detail_item, UITodoItem(it.id, it.title, it.desc, it.createTime, it.completed))
             }
         }
-
-        mBinding.markCb.setOnCheckedChangeListener { _, _ ->
-            mViewModel.updateTodo(mViewModel.todoDetail.value!!)
-        }
-
         mBinding.floatButton.setOnClickListener {
             val intent = Intent(it.context, AddTodoActivity::class.java)
             intent.putExtra("todoBean",dbDetailInfo)

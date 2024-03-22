@@ -16,21 +16,37 @@ import java.util.Random
 class StatsRepository {
 
     /**
-     * 获取待办列表
+     * 获取待办列表,返回Flow数据流
      */
-    fun getTodoList(): LiveData<MutableList<TodoListInfo>>? {
-        //模拟耗时
-        Thread.sleep(2000)
-        return DataBaseManager.getTodoList()
+    suspend fun getTodoListFlow(): Flow<MutableList<TodoListInfo>>? {
+        return withContext(Dispatchers.IO) {
+            DataBaseManager.getTodoListFlow()
+        }
     }
 
     /**
-     * 获取待办列表,返回Flow数据流
+     * 根据 id 获取条目
      */
-    fun getTodoListFlow(): Flow<MutableList<TodoListInfo>>? {
-        //模拟耗时
-        Thread.sleep(2000)
-        return DataBaseManager.getTodoListFlow()
+    suspend fun getTodoListFlow(id: Long): Flow<TodoListInfo>? {
+        return withContext(Dispatchers.IO) {
+            DataBaseManager.getTodoItemById(id)
+        }
+    }
+
+    /**
+     * 根据 id 删除条目
+     */
+    suspend fun deleteTodoItemById(id: Long) : Int {
+        return withContext(Dispatchers.IO) {
+            DataBaseManager.deleteTodoItemById(id)
+        }
+    }
+
+    /**
+     * 插入新条目
+     */
+    suspend fun insertTodoItem(todoListInfo: TodoListInfo):Long {
+        return DataBaseManager.insertTodoItem(todoListInfo)
     }
 
     /**
@@ -39,12 +55,13 @@ class StatsRepository {
     suspend fun addCompleteItem() {
         val random = Random()
         val randomChar = (random.nextInt(26).plus('A'.code)).toChar()
+        val randomChar2 = random.nextInt(1000)
         withContext(Dispatchers.IO) {
             val todoListInfo = TodoListInfo()
             todoListInfo.title =
-                randomChar.toString() + randomChar.toString() + randomChar.toString()
+                randomChar.toString() + randomChar.toString() + randomChar.toString() + randomChar2
             todoListInfo.desc = randomChar.toLowerCase().toString() + randomChar.toLowerCase()
-                .toString() + randomChar.toLowerCase().toString()
+                .toString() + randomChar.toLowerCase().toString() + randomChar2
             todoListInfo.completed = true
             todoListInfo.createTime = System.currentTimeMillis().toString()
             DataBaseManager.insertTodoItem(todoListInfo)
@@ -57,12 +74,13 @@ class StatsRepository {
     suspend fun addActiveItem() {
         val random = Random()
         val randomChar = (random.nextInt(26).plus('A'.code)).toChar()
+        val randomChar2 = random.nextInt(1000)
         withContext(Dispatchers.IO) {
             val todoListInfo = TodoListInfo()
             todoListInfo.title =
-                randomChar.toString() + randomChar.toString() + randomChar.toString()
+                randomChar.toString() + randomChar.toString() + randomChar.toString()+ randomChar2
             todoListInfo.desc = randomChar.toLowerCase().toString() + randomChar.toLowerCase()
-                .toString() + randomChar.toLowerCase().toString()
+                .toString() + randomChar.toLowerCase().toString() + randomChar2
             todoListInfo.createTime = System.currentTimeMillis().toString()
             DataBaseManager.insertTodoItem(todoListInfo)
         }
@@ -101,10 +119,18 @@ class StatsRepository {
     }
 
     /**
+     * 根据todoListInfo更新Item
+     * @param todoListInfo
+     */
+    suspend fun updateTodoItem(todoListInfo: TodoListInfo) :Int{
+        return DataBaseManager.updateTodoItem(todoListInfo)
+    }
+
+    /**
      * 修改一个条目状态
      */
-    suspend fun updateTodoItems(bean: TodoListInfo) {
-        withContext(Dispatchers.IO) {
+    suspend fun updateTodoItems(bean: TodoListInfo) : Int {
+        return withContext(Dispatchers.IO) {
             DataBaseManager.updateTodoItem(bean)
         }
     }
