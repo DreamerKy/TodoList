@@ -25,12 +25,11 @@ class TodosListPage extends BaseCommonView<NoteController> {
         controller,
         todosContentWidget(controller),
       ),
-      assignId: true,
     );
   }
 
   todosContentWidget(NoteController controller) {
-    controller.queryListByFilterStatus(
+    controller.getTodoListAll(
         controller.rxFilterOneStatus.value, controller.rxFilterTwoStatus.value);
     return Container(
       width: MediaQuery.of(Get.context!).size.width,
@@ -41,11 +40,11 @@ class TodosListPage extends BaseCommonView<NoteController> {
         color: Colors.white,
         borderRadius: BorderRadius.circular(12.0),
       ),
-      child: Obx(() => controller.rxNoteItems.isEmpty
+      child: Obx(() => controller.rxTodoListAll.isEmpty
           ? const Center(
               child: Text("No Data"),
             )
-          : todoListWidget(controller, controller.rxNoteItems)),
+          : todoListWidget(controller, controller.rxTodoListAll)),
     );
   }
 

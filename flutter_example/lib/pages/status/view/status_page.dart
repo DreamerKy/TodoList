@@ -15,7 +15,6 @@ class StatusPage extends BaseCommonView<NoteController> {
         controller,
         statusWidget(controller),
       ),
-      assignId: true,
     );
   }
 

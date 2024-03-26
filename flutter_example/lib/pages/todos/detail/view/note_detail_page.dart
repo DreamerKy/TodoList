@@ -39,7 +39,6 @@ class NoteDetailPage extends BaseCommonView<NoteController> {
         controller,
         noteDetailWidget(controller),
       ),
-      assignId: true,
     );
   }
 

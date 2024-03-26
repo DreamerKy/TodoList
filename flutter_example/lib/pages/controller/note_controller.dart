@@ -16,7 +16,9 @@ class NoteController extends BaseCommonController {
   PageController pageController = PageController();
   NoteDataRepository noteDataRepository = NoteDataRepository();
   RxInt currentIndex = 0.obs;
-  RxList<Rx<NoteItemEntity>> rxNoteItems = RxList<Rx<NoteItemEntity>>([]);
+
+  RxList<Rx<NoteItemEntity>> rxTodoListAll = RxList<Rx<NoteItemEntity>>([]);
+
   RxString rxFilterOneStatus = '1'.obs;
   RxString rxFilterTwoStatus = '1'.obs;
 
@@ -36,11 +38,11 @@ class NoteController extends BaseCommonController {
     getCalCount();
   }
 
-  queryListByFilterStatus(
-      String filterOneStatus, String filterTwoStatus) async {
-    rxNoteItems.value = await noteDataRepository.queryListByFilterStatus(
+  getTodoListAll(String filterOneStatus, String filterTwoStatus) async {
+    rxTodoListAll.value = await noteDataRepository.queryListByFilterStatus(
             filterOneStatus, filterTwoStatus) ??
         [];
+    print('filterOneStatus=$filterOneStatus,filterTwoStatus=$filterTwoStatus');
     getCalCount();
   }
 
@@ -64,14 +66,14 @@ class NoteController extends BaseCommonController {
   menuValueOneChanged(dynamic value) {
     rxFilterOneStatus.value = value;
     print("值改变了：${rxFilterOneStatus.value}");
-    queryListByFilterStatus(rxFilterOneStatus.value, rxFilterTwoStatus.value);
+    getTodoListAll(rxFilterOneStatus.value, rxFilterTwoStatus.value);
     getCalCount();
   }
 
   menuValueTwoChanged(dynamic value) {
     rxFilterTwoStatus.value = value;
     print("值改变了：${rxFilterTwoStatus.value}");
-    queryListByFilterStatus(rxFilterOneStatus.value, rxFilterTwoStatus.value);
+    getTodoListAll(rxFilterOneStatus.value, rxFilterTwoStatus.value);
     getCalCount();
   }
 
@@ -81,7 +83,7 @@ class NoteController extends BaseCommonController {
       itemEntity?.checked = isChecked ?? false;
     });
     noteDataRepository.updateData(rxItemEntity);
-    print('rxNoteItems toggleItemChecked=$rxNoteItems');
+    print('rxNoteItems toggleItemChecked=$rxTodoListAll');
     getCalCount();
   }
 

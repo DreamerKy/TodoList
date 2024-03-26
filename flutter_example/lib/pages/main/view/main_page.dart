@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:sp_util/sp_util.dart';
-import '../../../app/constants.dart';
 import '../../../app/mock/menu_data_helper.dart';
 import '../../../app/router/navigator.dart';
 import '../../../app/router/router_config.dart';
@@ -18,13 +16,12 @@ class MainPage extends BaseCommonView<NoteController> {
   MainPage({super.key});
   @override
   bool? get isHiddenNav => true;
-  NoteController noteController = Get.put(NoteController());
+
   @override
   Widget buildContent() {
     return GetBuilder<NoteController>(
-      init: noteController,
+      init: NoteController(),
       builder: (controller) => mainTabWidget(controller),
-      assignId: true,
     );
   }
 

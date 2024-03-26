@@ -6,7 +6,6 @@ import '../../../../app/constants.dart';
 import '../../../../app/router/navigator.dart';
 import '../../../../base/view/base_common_view.dart';
 import '../../../controller/note_controller.dart';
-import '../controller/add_note_controller.dart';
 
 class AddToNotePage extends BaseCommonView<NoteController> {
   AddToNotePage({super.key});
@@ -37,7 +36,6 @@ class AddToNotePage extends BaseCommonView<NoteController> {
         controller,
         addNoteWidget(controller),
       ),
-      assignId: true,
     );
   }
 
