@@ -17,7 +17,7 @@ class NoteController extends BaseCommonController {
   NoteDataRepository noteDataRepository = NoteDataRepository();
   RxInt currentIndex = 0.obs;
 
-  RxList<Rx<NoteItemEntity>> rxTodoListAll = RxList<Rx<NoteItemEntity>>([]);
+  RxList<Rx<NoteItemEntity>> rxTodoListAll = <Rx<NoteItemEntity>>[].obs;
 
   RxString rxFilterOneStatus = '1'.obs;
   RxString rxFilterTwoStatus = '1'.obs;
@@ -84,7 +84,25 @@ class NoteController extends BaseCommonController {
     });
     noteDataRepository.updateData(rxItemEntity);
     print('rxNoteItems toggleItemChecked=$rxTodoListAll');
+    filterTodoList(rxItemEntity);
     getCalCount();
+  }
+
+  filterTodoList(Rx<NoteItemEntity> rxItemEntity) {
+    switch (rxFilterOneStatus.value) {
+      case filterActive:
+        // 在已创建的事件列表中 勾选当前已完成的事件时，移出创建的事件列表。
+        rxTodoListAll.removeWhere((element) =>
+            element.value.id == rxItemEntity.value.id &&
+            element.value.checked == true);
+        break;
+      case filterCompleted:
+        // 在已完成的事件列表中 取消勾选当前已完成的事件时，移出已完成的事件列表。
+        rxTodoListAll.removeWhere((element) =>
+            element.value.id == rxItemEntity.value.id &&
+            element.value.checked == false);
+        break;
+    }
   }
 
   void getCalCount() async {

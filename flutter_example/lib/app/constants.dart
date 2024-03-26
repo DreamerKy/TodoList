@@ -24,3 +24,10 @@ const String valueIsEdit = 'YES';
 const String keyItemData = 'key_itemData';
 const String keyIsDel = 'key_is_del';
 const String valueIsDel = 'YES';
+
+/// filter menu Tag
+const String filterAll = '1';
+const String filterActive = '2';
+const String filterCompleted = '3';
+const String filterMark = '4';
+const String filterClearCompleted = '5';

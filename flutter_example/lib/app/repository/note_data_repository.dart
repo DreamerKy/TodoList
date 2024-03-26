@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import '../../base/network/base_http_request.dart';
 import '../../entity/note_item_enity.dart';
+import '../constants.dart';
 import '../database/note_database_helper.dart';
 import 'base/base_repository.dart';
 
@@ -87,25 +88,25 @@ class NoteDataRepository extends BaseRepository<NoteItemEntity> {
     //查询全部数据
     RxList<Rx<NoteItemEntity>>? allNoteItems = await getAllData();
     switch (filterOneStatus) {
-      case '1':
+      case filterAll:
         // 获取全部数据
         allNoteItems = allNoteItems;
         break;
-      case '2':
+      case filterActive:
         // 显示已创建的事件
         allNoteItems = findListByCondition(allNoteItems, false);
         break;
-      case '3':
+      case filterCompleted:
         // 显示已完成的事件
         allNoteItems = findListByCondition(allNoteItems, true);
         break;
     }
     switch (filterTwoStatus) {
-      case '4':
+      case filterMark:
         //标记全部完成/标记全部待办
         allNoteItems = getSelectChangedDataList(allNoteItems);
         break;
-      case '5':
+      case filterClearCompleted:
         // 清除完成数据
         clearFinishedDatas(allNoteItems);
         break;
