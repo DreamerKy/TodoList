@@ -10,10 +10,11 @@ List<MenuItemEntity> createSelectFuncDataList() {
 }
 
 /// markAllCompleteTag "0" :标记全部完成;"1":标记全部待办 -1:其他
-List<MenuItemEntity> createFilterDataList(bool markAllComplete) {
+List<MenuItemEntity> createFilterDataList(String markAllCompleteTag) {
   return [
     MenuItemEntity(
-        label: markAllComplete ? "标记全部完成" : "标记全部待办", value: filterMark),
+        label: markAllCompleteTag == '0' ? "标记全部完成" : "标记全部待办",
+        value: filterMark),
     MenuItemEntity(label: "清除完成数据", value: filterClearCompleted),
   ];
 }

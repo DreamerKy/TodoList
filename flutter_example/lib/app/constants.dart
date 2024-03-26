@@ -24,7 +24,6 @@ const String valueIsEdit = 'YES';
 const String keyItemData = 'key_itemData';
 const String keyIsDel = 'key_is_del';
 const String valueIsDel = 'YES';
-const String isMarkAllComple = 'is_mark_all_complete';
 
 /// filter menu Tag
 const String filterAll = '1';
