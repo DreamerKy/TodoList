@@ -31,3 +31,4 @@ const String filterActive = '2';
 const String filterCompleted = '3';
 const String filterMark = '4';
 const String filterClearCompleted = '5';
+const String isMarkAllComple = 'is_mark_all_complete';
