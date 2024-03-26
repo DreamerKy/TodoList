@@ -67,7 +67,6 @@ class TodosListController extends BaseCommonController {
       itemEntity.value.checked = markAllComplete;
     }
     noteDataRepository.updateMultipleData(allNoteItems);
-    noteDataRepository.setMarkAllComplete(markAllComplete);
     return allNoteItems;
   }
 

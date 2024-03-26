@@ -29,8 +29,7 @@ class TodosListPage extends BaseCommonView<NoteController> {
   }
 
   todosContentWidget(NoteController controller) {
-    controller.getTodoListAll(
-        controller.rxFilterOneStatus.value, controller.rxFilterTwoStatus.value);
+    controller.getTodoListAll(controller.rxFilterOneStatus.value);
     return Container(
       width: MediaQuery.of(Get.context!).size.width,
       // 允许高度自适应

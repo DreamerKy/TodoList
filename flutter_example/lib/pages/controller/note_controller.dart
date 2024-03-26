@@ -3,6 +3,7 @@
 import 'package:date_format/date_format.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:vanilla_example/app/util/mark_status_util.dart';
 import '../../app/constants.dart';
 import '../../app/database/util/data_util.dart';
 import '../../app/repository/note_data_repository.dart';
@@ -25,6 +26,8 @@ class NoteController extends BaseCommonController {
   RxInt rxActiveNumber = 0.obs;
   RxInt rxFinishNumber = 0.obs;
 
+  RxBool markStatus = false.obs;
+
   ///add
   final TextEditingController titleController = TextEditingController();
   final TextEditingController contentController = TextEditingController();
@@ -38,11 +41,10 @@ class NoteController extends BaseCommonController {
     getCalCount();
   }
 
-  getTodoListAll(String filterOneStatus, String filterTwoStatus) async {
-    rxTodoListAll.value = await noteDataRepository.queryListByFilterStatus(
-            filterOneStatus, filterTwoStatus) ??
-        [];
-    print('filterOneStatus=$filterOneStatus,filterTwoStatus=$filterTwoStatus');
+  getTodoListAll(String filterStatus) async {
+    rxTodoListAll.value =
+        await noteDataRepository.queryListByFilterStatus(filterStatus) ?? [];
+    print('filterOneStatus=$filterStatus');
     getCalCount();
   }
 
@@ -66,15 +68,38 @@ class NoteController extends BaseCommonController {
   menuValueOneChanged(dynamic value) {
     rxFilterOneStatus.value = value;
     print("值改变了：${rxFilterOneStatus.value}");
-    getTodoListAll(rxFilterOneStatus.value, rxFilterTwoStatus.value);
+    getTodoListAll(rxFilterOneStatus.value);
     getCalCount();
   }
 
   menuValueTwoChanged(dynamic value) {
     rxFilterTwoStatus.value = value;
     print("值改变了：${rxFilterTwoStatus.value}");
-    getTodoListAll(rxFilterOneStatus.value, rxFilterTwoStatus.value);
+    rightMenuFunc(value);
     getCalCount();
+  }
+
+  rightMenuFunc(dynamic value) {
+    switch (value) {
+      case filterMark:
+        doMark();
+        break;
+      case filterClearCompleted:
+        clearCompleted();
+        break;
+      default:
+    }
+  }
+
+  doMark() {
+    bool markALLComplete = MarkStatusUtil.isMarkALLComplete();
+    noteDataRepository.updateTodoItems(rxTodoListAll, markALLComplete);
+    MarkStatusUtil.setMarkALLComplete(markALLComplete);
+    markStatus.value = markALLComplete;
+  }
+
+  void clearCompleted() {
+    noteDataRepository.clearFinishedDatas(rxTodoListAll);
   }
 
   void toggleItemChecked(bool? isChecked, Rx<NoteItemEntity> rxItemEntity) {
