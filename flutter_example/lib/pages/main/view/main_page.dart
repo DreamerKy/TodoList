@@ -114,23 +114,25 @@ class MainPage extends BaseCommonView<NoteController> {
   }
 
   Widget createFilteMenuOneWidget() {
-    return controller.currentIndex == 0
-        ? Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              FhKeepAliveWrapper(
-                child: SelectWidget(
-                  items: createSelectFuncDataList(),
-                  value: controller.rxFilterOneStatus.value,
-                  valueChanged: (value) {
-                    controller.menuValueOneChanged(value);
-                  },
-                  showTitle: true,
+    return Obx(
+      () => controller.currentIndex.value == 0
+          ? Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                FhKeepAliveWrapper(
+                  child: SelectWidget(
+                    items: createSelectFuncDataList(),
+                    value: controller.rxFilterOneStatus.value,
+                    valueChanged: (value) {
+                      controller.menuValueOneChanged(value);
+                    },
+                    showTitle: true,
+                  ),
                 ),
-              ),
-            ],
-          )
-        : Container();
+              ],
+            )
+          : Container(),
+    );
   }
 
   Widget createFilteMenuTwoWidget(NoteController controller) {

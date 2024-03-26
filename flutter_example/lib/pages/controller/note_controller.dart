@@ -83,7 +83,6 @@ class NoteController extends BaseCommonController {
       itemEntity?.checked = isChecked ?? false;
     });
     noteDataRepository.updateData(rxItemEntity);
-    print('rxNoteItems toggleItemChecked=$rxTodoListAll');
     filterTodoList(rxItemEntity);
     getCalCount();
   }
