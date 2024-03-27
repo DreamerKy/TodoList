@@ -11,3 +11,5 @@
 1. 采用 Kotlin 语言编写，结合 Jetpack 相关控件，`Lifecyle`，`DataBinding`，`LiveData`，`Flow`，`ViewModel`等搭建的 **MVVM** 架构模式；
 2. 通过 **模块化**拆分，实现项目更好解耦和复用；
 3. 使用 **协程+Room** 地实现本地数据存储和获取；
+![Screenshot_20240327_164927](https://github.com/DreamerKy/TodoList/assets/24971143/0e74b8dd-377c-46cd-ae7e-58fe9b73b60d) ![Screenshot_20240327_164950](https://github.com/DreamerKy/TodoList/assets/24971143/c0aedf5b-98a8-4e73-a544-858cc30ef385)
+
