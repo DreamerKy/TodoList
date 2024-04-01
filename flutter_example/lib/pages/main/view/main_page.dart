@@ -142,8 +142,8 @@ class MainPage extends BaseCommonView<NoteController> {
         FhKeepAliveWrapper(
           child: Obx(
             () => SelectWidget(
-              items: createFilterDataList(
-                  controller.noteDataRepository.rxMarkAllCompleteTag.value),
+              items:
+                  createFilterDataList(controller.rxMarkAllCompleteTag.value),
               value: controller.rxFilterTwoStatus.value,
               valueChanged: (value) {
                 controller.menuValueTwoChanged(value);

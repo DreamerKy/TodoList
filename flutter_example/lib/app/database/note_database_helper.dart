@@ -40,7 +40,6 @@ class NoteDataBaseHelper {
         noteItemBox.putAt(index, item.value);
       }
     }
-    noteItemBox.close();
   }
 
   deleteMultipleItems(RxList<Rx<NoteItemEntity>> noteItems) async {
@@ -67,7 +66,7 @@ class NoteDataBaseHelper {
     noteItemBox.clear();
   }
 
-  Future<RxList<Rx<NoteItemEntity>>> getAllNoteItems() async {
+  Future<List<Rx<NoteItemEntity>>> getAllNoteItems() async {
     noteItemBox = await openNoteBox();
     final noteItems = noteItemBox.values.map((item) => item.obs).toList();
 
@@ -77,7 +76,7 @@ class NoteDataBaseHelper {
       final realTimeB = DateTime.parse(b.value.saveTime!);
       return realTimeB.compareTo(realTimeA);
     });
-    return noteItems.obs;
+    return noteItems;
   }
 
   closeNoteBox() {

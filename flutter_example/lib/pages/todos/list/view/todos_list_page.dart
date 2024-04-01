@@ -29,8 +29,7 @@ class TodosListPage extends BaseCommonView<NoteController> {
   }
 
   todosContentWidget(NoteController controller) {
-    controller.getTodoListAll(
-        controller.rxFilterOneStatus.value, controller.rxFilterTwoStatus.value);
+    controller.todoListAll();
     return Container(
       width: MediaQuery.of(Get.context!).size.width,
       // 允许高度自适应
@@ -40,11 +39,11 @@ class TodosListPage extends BaseCommonView<NoteController> {
         color: Colors.white,
         borderRadius: BorderRadius.circular(12.0),
       ),
-      child: Obx(() => controller.rxTodoListAll.isEmpty
+      child: Obx(() => controller.rxShowTodoListAll.isEmpty
           ? const Center(
               child: Text("No Data"),
             )
-          : todoListWidget(controller, controller.rxTodoListAll)),
+          : todoListWidget(controller, controller.rxShowTodoListAll)),
     );
   }
 

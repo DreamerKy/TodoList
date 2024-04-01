@@ -5,7 +5,6 @@ class TodosListBindings extends Bindings {
   @override
   void dependencies() {
     Get.lazyPut(
-      // () => TodosListController(),
       () => NoteController(),
     );
   }

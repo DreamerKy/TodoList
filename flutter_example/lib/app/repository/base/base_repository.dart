@@ -7,10 +7,7 @@ abstract class BaseRepository<T> {
 
   void handleError(error);
 
-  Future<RxList<Rx<T>>> getAllData();
-
-  Future<RxList<Rx<T>>?> queryListByFilterStatus(
-      String filterOneStatus, String filterTwoStatus);
+  Future<List<Rx<T>>> getAllData();
 
   void insertData(Rx<T> data);
 

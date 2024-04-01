@@ -5,9 +5,8 @@ import '../../controller/note_controller.dart';
 class MainBindings extends Bindings {
   @override
   void dependencies() {
-    Get.put(
+    Get.lazyPut(
       () => NoteController(),
-      permanent: true,
     );
   }
 }

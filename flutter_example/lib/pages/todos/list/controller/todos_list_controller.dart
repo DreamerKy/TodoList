@@ -26,7 +26,7 @@ class TodosListController extends BaseCommonController {
   findAllNodeList(String filterCriteria) async {
     await Future.delayed(const Duration(milliseconds: 200));
     //查询全部数据
-    RxList<Rx<NoteItemEntity>> allNoteItems =
+    List<Rx<NoteItemEntity>> allNoteItems =
         await noteDataRepository.getAllData();
     switch (filterCriteria) {
       case '1':
@@ -36,20 +36,20 @@ class TodosListController extends BaseCommonController {
       case '2':
         // 显示已创建的事件
         allNoteItems =
-            noteDataRepository.findListByCondition(allNoteItems, false);
+            noteDataRepository.findListByCondition(allNoteItems.obs, false);
         break;
       case '3':
         // 显示已完成的事件
         allNoteItems =
-            noteDataRepository.findListByCondition(allNoteItems, true);
+            noteDataRepository.findListByCondition(allNoteItems.obs, true);
         break;
       case '4':
         //全选/取消全选
-        allNoteItems = getSelectChangedDataList(allNoteItems);
+        allNoteItems = getSelectChangedDataList(allNoteItems.obs);
         break;
       case '5':
         // 清除数据
-        clearAllDatas(allNoteItems);
+        clearAllDatas(allNoteItems.obs);
         break;
       default:
     }
@@ -67,7 +67,6 @@ class TodosListController extends BaseCommonController {
       itemEntity.value.checked = markAllComplete;
     }
     noteDataRepository.updateMultipleData(allNoteItems);
-    noteDataRepository.setMarkAllComplete(markAllComplete);
     return allNoteItems;
   }
 

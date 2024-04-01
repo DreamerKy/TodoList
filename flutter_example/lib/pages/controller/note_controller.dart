@@ -8,6 +8,7 @@ import '../../app/database/util/data_util.dart';
 import '../../app/repository/note_data_repository.dart';
 import '../../app/router/navigator.dart';
 import '../../app/router/router_config.dart';
+import '../../app/util/mark_status_util.dart';
 import '../../app/util/snackbar_util.dart';
 import '../../base/controller/base_common_controller.dart';
 import '../../entity/note_item_enity.dart';
@@ -17,6 +18,8 @@ class NoteController extends BaseCommonController {
   NoteDataRepository noteDataRepository = NoteDataRepository();
   RxInt currentIndex = 0.obs;
 
+  /// rxShowTodoListAll 用于列表显示的数据集合
+  RxList<Rx<NoteItemEntity>> rxShowTodoListAll = <Rx<NoteItemEntity>>[].obs;
   RxList<Rx<NoteItemEntity>> rxTodoListAll = <Rx<NoteItemEntity>>[].obs;
 
   RxString rxFilterOneStatus = '1'.obs;
@@ -24,6 +27,7 @@ class NoteController extends BaseCommonController {
 
   RxInt rxActiveNumber = 0.obs;
   RxInt rxFinishNumber = 0.obs;
+  RxString rxMarkAllCompleteTag = '0'.obs;
 
   ///add
   final TextEditingController titleController = TextEditingController();
@@ -35,15 +39,37 @@ class NoteController extends BaseCommonController {
   @override
   void initData() {
     // TODO: implement initData
+  }
+
+  todoListAll() async {
+    List<Rx<NoteItemEntity>> findNoteItems =
+        await noteDataRepository.getAllData();
+    rxTodoListAll.value = findNoteItems;
+    print('rxTodoListAll = $rxTodoListAll');
+    switch (rxFilterOneStatus.value) {
+      case filterAll:
+        //查询全部数据
+        updateLiveDataValue(findNoteItems);
+        break;
+      case filterActive:
+        //查询已创建的数据
+        List<Rx<NoteItemEntity>> dataList =
+            noteDataRepository.findListByCondition(findNoteItems.obs, false);
+        updateLiveDataValue(dataList);
+        break;
+      case filterCompleted:
+        //查询已完成的数据
+        List<Rx<NoteItemEntity>> dataList =
+            noteDataRepository.findListByCondition(findNoteItems.obs, true);
+        updateLiveDataValue(dataList);
+        break;
+      default:
+    }
     getCalCount();
   }
 
-  getTodoListAll(String filterOneStatus, String filterTwoStatus) async {
-    rxTodoListAll.value = await noteDataRepository.queryListByFilterStatus(
-            filterOneStatus, filterTwoStatus) ??
-        [];
-    print('filterOneStatus=$filterOneStatus,filterTwoStatus=$filterTwoStatus');
-    getCalCount();
+  updateLiveDataValue(List<Rx<NoteItemEntity>> dataList) {
+    rxShowTodoListAll.value = dataList;
   }
 
   backResultFunc(dynamic result, Rx<NoteItemEntity> rxItemEntity,
@@ -66,14 +92,63 @@ class NoteController extends BaseCommonController {
   menuValueOneChanged(dynamic value) {
     rxFilterOneStatus.value = value;
     print("值改变了：${rxFilterOneStatus.value}");
-    getTodoListAll(rxFilterOneStatus.value, rxFilterTwoStatus.value);
-    getCalCount();
+    filterTodoList(value);
   }
 
   menuValueTwoChanged(dynamic value) {
     rxFilterTwoStatus.value = value;
     print("值改变了：${rxFilterTwoStatus.value}");
-    getTodoListAll(rxFilterOneStatus.value, rxFilterTwoStatus.value);
+    rightMenuFunc(value);
+    filterTodoList(rxFilterOneStatus.value);
+  }
+
+  filterTodoList(dynamic value) {
+    switch (value) {
+      case filterAll:
+        //查询全部数据
+        updateLiveDataValue(rxTodoListAll);
+        break;
+      case filterActive:
+        //查询已创建的数据
+        List<Rx<NoteItemEntity>> dataList =
+            noteDataRepository.findListByCondition(rxTodoListAll, false);
+        updateLiveDataValue(dataList);
+        break;
+      case filterCompleted:
+        //查询已完成的数据
+        List<Rx<NoteItemEntity>> dataList =
+            noteDataRepository.findListByCondition(rxTodoListAll, true);
+        updateLiveDataValue(dataList);
+        break;
+      default:
+    }
+  }
+
+  void rightMenuFunc(dynamic value) {
+    switch (value) {
+      case filterMark:
+        //标记全部完成/标记全部待办
+        toMark(MarkStatusUtil.isMarkALLComplete());
+        break;
+      case filterClearCompleted:
+        // 清除完成数据
+        noteDataRepository.clearFinishedDatas(rxShowTodoListAll);
+        getCalCount();
+        break;
+    }
+  }
+
+  toMark(bool toMarkAllCompleted) {
+    print('切换之前=$toMarkAllCompleted');
+    toMarkAllCompleted = !toMarkAllCompleted;
+    print('切换之后=$toMarkAllCompleted');
+    for (var element in rxTodoListAll) {
+      element.value.checked = toMarkAllCompleted;
+    }
+    noteDataRepository.updateMultipleData(rxTodoListAll);
+    MarkStatusUtil.setMarkALLComplete(toMarkAllCompleted);
+    rxMarkAllCompleteTag.value = toMarkAllCompleted ? '1' : '0';
+    rxShowTodoListAll.refresh();
     getCalCount();
   }
 
@@ -83,25 +158,28 @@ class NoteController extends BaseCommonController {
       itemEntity?.checked = isChecked ?? false;
     });
     noteDataRepository.updateData(rxItemEntity);
-    filterTodoList(rxItemEntity);
+    clickFilterTodoList(rxItemEntity);
     getCalCount();
   }
 
-  filterTodoList(Rx<NoteItemEntity> rxItemEntity) {
+  clickFilterTodoList(Rx<NoteItemEntity> rxItemEntity) {
     switch (rxFilterOneStatus.value) {
       case filterActive:
         // 在已创建的事件列表中 勾选当前已完成的事件时，移出创建的事件列表。
-        rxTodoListAll.removeWhere((element) =>
+        rxShowTodoListAll.removeWhere((element) =>
             element.value.id == rxItemEntity.value.id &&
             element.value.checked == true);
+        rxShowTodoListAll.refresh();
         break;
       case filterCompleted:
         // 在已完成的事件列表中 取消勾选当前已完成的事件时，移出已完成的事件列表。
-        rxTodoListAll.removeWhere((element) =>
+        rxShowTodoListAll.removeWhere((element) =>
             element.value.id == rxItemEntity.value.id &&
             element.value.checked == false);
+        rxShowTodoListAll.refresh();
         break;
     }
+    getCalCount();
   }
 
   void getCalCount() async {
@@ -141,11 +219,11 @@ class NoteController extends BaseCommonController {
           if (result != null) {
             itemEntity?.title = result[keyTitle];
             itemEntity?.subTitle = result[keySubTitle];
-            getCalCount();
           }
         });
       },
     );
+    getCalCount();
   }
 
   setEditMode(String isEdit) {
